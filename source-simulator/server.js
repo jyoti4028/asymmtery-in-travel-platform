@@ -49,8 +49,8 @@ const Port =3012;
             if(ticket.chartPrepared === false){
                ticket.chartPrepared=true;  // the chart is now finalised 
                 
-               if(ticket.status === "Waitlisted"){
-                  ticket.status = "Canceled" ; //the waitlist is dead!
+               if(ticket.status === "waitlisted"){
+                  ticket.status = "Cancelled" ; //the waitlist is dead!
                   console.log(` -> Pnr: ${ticket.pnr} has been cancelled.`);
                }
             }
