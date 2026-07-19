@@ -80,7 +80,7 @@ app.post('/api/platform/buy-trip-gurantee',(req,res)=>{
               // ignore the cache completely and go straight to to source
               const response=await fetch(`http://localhost:3012/api/source/ticket/${pnr}`);
               if(!response.ok){
-                  return.res.status(404).json({
+                  return res.status(404).json({
                       error:"ticket not found in the source simulator"});
               }
               const result=await response.json();
@@ -88,14 +88,14 @@ app.post('/api/platform/buy-trip-gurantee',(req,res)=>{
               //optionally refresh the cache too so future reads aren't stale either
               Mydatabase[pnr]=liveticket;
               if(liveticket.status==='waitlisted'&&liveticket.chartPrepared===false){
-                  return.res.status(200).json({
+                  return res.status(200).json({
                       success:true,
                       message:"trip-gurantee bought success",
                       data:liveticket
                   });
               }
               else{
-                  return.res.status(400).json({
+                  return res.status(400).json({
                       happened:false,
                       message:"transaction is blocked chart is prepared"
                   });
@@ -103,11 +103,10 @@ app.post('/api/platform/buy-trip-gurantee',(req,res)=>{
           }
           catch(error){
               console.error("error verifying live status");
-              return.res.status(500).json({
+              return res.status(500).json({
                   error:"Aggregator failed to connect here"
               });
           }
-      }
                });
               
 app.listen(PORT, () => {
