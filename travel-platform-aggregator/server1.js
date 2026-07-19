@@ -37,7 +37,7 @@ app.get('/api/platform/ticket/:pnr', async (req, res) => {
         return res.status(200).json({
              cache:false,
              source:"fresh from Irctc source",
-             data: Result
+             data: Mydatabase[pnr]
         });
 }
    catch(error){
