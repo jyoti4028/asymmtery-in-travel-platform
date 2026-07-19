@@ -11,7 +11,7 @@ const Mydatabase = {};
 app.get('/api/platform/ticket/:pnr', async (req, res) => {
     const pnr = req.params.pnr;
 
-    // TODO: We will write the logic here to fetch from Port 3012
+    // We will write the logic here to fetch from Port 3012
    // check the local cache first 
   /// this is Vulnerability ! if it's cached we trust it blindly
    if(Mydatabase[pnr]){
@@ -23,7 +23,7 @@ app.get('/api/platform/ticket/:pnr', async (req, res) => {
    } 
    try{
     //Fetch fresh data from the source server(port 3012)
-    const response= await fetch(`https://localhost:3012/api/source/ticket/${pnr}`);
+    const response= await fetch(`http://localhost:3012/api/source/ticket/${pnr}`);
     //const irctcResult = await response.json();
      if(!response.ok){
         return res.status(404).json({
@@ -32,7 +32,7 @@ app.get('/api/platform/ticket/:pnr', async (req, res) => {
      }   
      const Result= await response.json();
      // store the fresh data in the local cache
-       Mydatabase[pnr] = Result;
+       Mydatabase[pnr] = Result.hand;
 
         return res.status(200).json({
              cache:false,
@@ -48,7 +48,7 @@ app.get('/api/platform/ticket/:pnr', async (req, res) => {
    }
 });
 ////3. the vulnerable Action route (buying the trip Gurantee)
-app.post(' /api/platform/buy-trip-gurantee',(req,res)=>{
+app.post('/api/platform/buy-trip-gurantee',(req,res)=>{
       const pnr = req.body.pnr;
       /// we grab the data from the local cache 
           const ticketdata= Mydatabase[pnr];
@@ -58,7 +58,7 @@ app.post(' /api/platform/buy-trip-gurantee',(req,res)=>{
             });
            }
            /// the Fatal flaw: we trust the ticket data to process payment
-          if(ticketdata.status === 'Waitlisted' && ticketdata.chartPrepared === false){
+          if(ticketdata.status === 'waitlisted' && ticketdata.chartPrepared === false){
             // the server happily sells the insurance
               return res.status(200).json({
                 success: true,
