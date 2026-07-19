@@ -74,7 +74,42 @@ app.post('/api/platform/buy-trip-gurantee',(req,res)=>{
    });
        }   
     });
-    
+      app.post('/api/platform/buy-trip-gurantee-secure',async(req,res)=>{
+          const pnr =req.body.pnr;
+          try{
+              // ignore the cache completely and go straight to to source
+              const response=await fetch(`http://localhost:3012/api/source/ticket/${pnr}`);
+              if(!response.ok){
+                  return.res.status(404).json({
+                      error:"ticket not found in the source simulator"});
+              }
+              const result=await response.json();
+              const liveticket=result.hand;
+              //optionally refresh the cache too so future reads aren't stale either
+              Mydatabase[pnr]=liveticket;
+              if(liveticket.status==='waitlisted'&&liveticket.chartPrepared===false){
+                  return.res.status(200).json({
+                      success:true,
+                      message:"trip-gurantee bought success",
+                      data:liveticket
+                  });
+              }
+              else{
+                  return.res.status(400).json({
+                      happened:false,
+                      message:"transaction is blocked chart is prepared"
+                  });
+              }
+          }
+          catch(error){
+              console.error("error verifying live status");
+              return.res.status(500).json({
+                  error:"Aggregator failed to connect here"
+              });
+          }
+      }
+               });
+              
 app.listen(PORT, () => {
     console.log(`✈️ Travel Platform Aggregator running on http://localhost:${PORT}`);
 });
